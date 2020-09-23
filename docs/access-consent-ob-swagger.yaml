@@ -1,0 +1,18 @@
+openapi: 3.0.1
+info:
+  title: access-consent-ob
+  description: Account access consents - Open Banking UK
+  contact:
+    email: miltonbo@gluu.org
+  license:
+    name: License
+    url: 'https://github.com/GluuFederation/access-consent-ob/blob/master/LICENSE'
+  version: '1.0'
+servers:
+  - url: 'https://gluu.org/'
+tags:
+  - name: developers
+    description: access-consent has many different endpoints responsible to manage consents in an Open Banking deployment.
+  - name: Open Banking UK
+  - name: OAuth - OpenID Connect
+
