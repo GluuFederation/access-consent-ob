@@ -1,4 +1,4 @@
-package org.gluu.ob.persistence.entity;
+package org.gluu.ob.domain.entity;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

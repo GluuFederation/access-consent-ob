@@ -1,9 +1,13 @@
 package org.gluu.ob.rest.resource;
 
 import lombok.extern.slf4j.Slf4j;
-import org.gluu.ob.persistence.entity.ConsentEntity;
-import org.gluu.ob.persistence.repository.ConsentRepository;
+import org.gluu.ob.domain.entity.ConsentEntity;
+import org.gluu.ob.domain.repository.ConsentRepository;
+import org.gluu.ob.exception.InternalError;
+import org.gluu.ob.rest.model.ApiError;
 import org.gluu.ob.rest.model.Consent;
+import org.gluu.ob.rest.model.PostConsent;
+import org.gluu.ob.service.ConsentService;
 import org.gluu.ob.util.converters.ConsentConverter;
 
 import javax.inject.Inject;
@@ -22,18 +26,34 @@ import static org.gluu.ob.util.ApiConstants.*;
 public class ConsentsResource {
 
     @Inject
-    private ConsentRepository consentRepository;
+    ConsentRepository consentRepository;
+
+    @Inject
+    ConsentService consentService;
 
     @GET
     @Path("/{id}")
     public Response getConsent(@PathParam("id") String consentId) {
-        log.info("Get consent, id: {}", consentId);
         Optional<ConsentEntity> consentOptional = consentRepository.findById(Long.parseLong(consentId));
         if (consentOptional.isPresent()) {
+            log.info("Get consent, id: {}", consentId);
+
             Consent consent = ConsentConverter.toObject(consentOptional.get());
             return Response.ok(consent).build();
         } else {
-            return Response.ok().build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(new ApiError("Consent not found.")).build();
+        }
+    }
+
+    @POST
+    public Response postConsent(PostConsent consent) {
+        try {
+            Consent newConsent = consentService.create(consent);
+            return Response.ok(newConsent).build();
+        } catch (InternalError internalError) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiError(internalError.getDescription())).build();
         }
     }
 

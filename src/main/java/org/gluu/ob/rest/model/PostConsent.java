@@ -11,17 +11,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Consent {
+public class PostConsent {
 
-    private String consentId;
     private String profile;
     private List<String> permissions;
-    private List<String> accounts;
-    private String clientId;
-    private String userId;
-    private String status;
-    private String statusUpdateDatetime;
-    private String creationDatetime;
     private String expirationDatetime;
     private String transactionFromDatetime;
     private String transactionToDatetime;
