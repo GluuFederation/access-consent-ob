@@ -1,4 +1,4 @@
-package org.gluu.ob.persistence.converters;
+package org.gluu.ob.util.converters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,6 +1,7 @@
 # Eclipse
 .project
 access-consent-ob*.log
+access-consent-ob.log*
 .classpath
 .settings/
 bin/

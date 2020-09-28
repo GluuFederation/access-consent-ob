@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.gluu.ob.persistence.converters.ArrayToJsonConverter;
+import org.gluu.ob.util.converters.ArrayToJsonConverter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,7 +16,7 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode(of = "id")
 @ToString(of = "id")
-public class Consent {
+public class ConsentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
