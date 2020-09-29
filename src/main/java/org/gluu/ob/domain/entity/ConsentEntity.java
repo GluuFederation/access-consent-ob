@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.gluu.ob.domain.enums.ConsentStatusEnum;
 import org.gluu.ob.util.converters.ArrayToJsonConverter;
 
 import javax.persistence.*;
@@ -40,7 +41,9 @@ public class ConsentEntity {
     private Date creationDatetime;
 
     @Column
-    private String status;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private ConsentStatusEnum status;
 
     @Column(name = "status_update_datetime")
     @NotNull

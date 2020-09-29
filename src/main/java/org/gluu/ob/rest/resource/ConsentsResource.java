@@ -26,19 +26,14 @@ import static org.gluu.ob.util.ApiConstants.*;
 public class ConsentsResource {
 
     @Inject
-    ConsentRepository consentRepository;
-
-    @Inject
     ConsentService consentService;
 
     @GET
     @Path("/{id}")
     public Response getConsent(@PathParam("id") String consentId) {
-        Optional<ConsentEntity> consentOptional = consentRepository.findById(Long.parseLong(consentId));
-        if (consentOptional.isPresent()) {
+        Consent consent = consentService.getConsent(consentId);
+        if (consent != null) {
             log.info("Get consent, id: {}", consentId);
-
-            Consent consent = ConsentConverter.toObject(consentOptional.get());
             return Response.ok(consent).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND)
@@ -53,6 +48,18 @@ public class ConsentsResource {
             return Response.ok(newConsent).build();
         } catch (InternalError internalError) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiError(internalError.getDescription())).build();
+        }
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response deleteConsent(@PathParam("id") String consentId) {
+        try {
+            consentService.revokeConsent(consentId);
+            return Response.ok().build();
+        } catch (InternalError internalError) {
+            return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ApiError(internalError.getDescription())).build();
         }
     }

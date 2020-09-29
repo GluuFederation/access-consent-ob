@@ -17,7 +17,7 @@ public class ConsentConverter {
         consent.setExpirationDatetime(Utils.formatDate(consentEntity.getExpirationDatetime(), ApiConstants.DATE_FORMAT));
         consent.setTransactionFromDatetime(Utils.formatDate(consentEntity.getTransactionFromDatetime(), ApiConstants.DATE_FORMAT));
         consent.setTransactionToDatetime(Utils.formatDate(consentEntity.getTransactionToDatetime(), ApiConstants.DATE_FORMAT));
-        consent.setStatus(consentEntity.getStatus());
+        consent.setStatus(consentEntity.getStatus().getValue());
         consent.setUserId(consentEntity.getUserId());
         consent.setProfile(consentEntity.getProfile());
         consent.setStatusUpdateDatetime(Utils.formatDate(consentEntity.getStatusUpdateDatetime(), ApiConstants.DATE_FORMAT));
