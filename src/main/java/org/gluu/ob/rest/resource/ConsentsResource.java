@@ -5,6 +5,7 @@ import org.gluu.ob.exception.InternalError;
 import org.gluu.ob.rest.model.ApiError;
 import org.gluu.ob.rest.model.Consent;
 import org.gluu.ob.rest.model.PostConsent;
+import org.gluu.ob.rest.model.PutConsent;
 import org.gluu.ob.service.ConsentService;
 
 import javax.inject.Inject;
@@ -55,6 +56,18 @@ public class ConsentsResource {
             return Response.ok().build();
         } catch (InternalError internalError) {
             return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new ApiError(internalError.getDescription())).build();
+        }
+    }
+
+    @PUT
+    @Path("/{id}")
+    public Response putConsent(@PathParam("id") String consentId, PutConsent putConsent) {
+        try {
+            Consent consent = consentService.putConsentStatus(consentId, putConsent.getAction());
+            return Response.ok(consent).build();
+        } catch (InternalError internalError) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(new ApiError(internalError.getDescription())).build();
         }
     }

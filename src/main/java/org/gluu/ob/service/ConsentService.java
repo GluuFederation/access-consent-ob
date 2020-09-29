@@ -108,4 +108,34 @@ public class ConsentService {
         return consentEntityOptional.map(ConsentConverter::toObject).orElse(null);
     }
 
+    public Consent putConsentStatus(String consentId, String action) throws InternalError {
+        if (StringUtils.isEmpty(action)) {
+            throw new InternalError("Action can not be empty.");
+        }
+        Long id = Long.parseLong(consentId.replace(ApiConstants.CONSENT_ID_PREFIX, ""));
+        Optional<ConsentEntity> consentEntityOptional = consentRepository.findById(id);
+        if (consentEntityOptional.isEmpty()) {
+            throw new InternalError("Consent not found.");
+        }
+
+        ConsentEntity consent = consentEntityOptional.get();
+        if (!ConsentStatusEnum.AWAITING_AUTHORISATION.getValue().equals(consent.getStatus().getValue())) {
+            throw new InternalError("Consent can not be updated because it is not waiting authorisation.");
+        }
+
+        if (action.equals(ConsentStatusEnum.AUTHORISED.getAction())) {
+            consent.setStatus(ConsentStatusEnum.AUTHORISED);
+        } else if (action.equals(ConsentStatusEnum.REJECTED.getAction())) {
+            consent.setStatus(ConsentStatusEnum.REJECTED);
+        } else {
+            throw new InternalError("Action can not be processed.");
+        }
+        consent.setStatusUpdateDatetime(new Date());
+        consent = consentRepository.save(consent);
+
+        log.info("Consent updated, values: {}, action: {}", consent, action);
+
+        return ConsentConverter.toObject(consent);
+    }
+
 }

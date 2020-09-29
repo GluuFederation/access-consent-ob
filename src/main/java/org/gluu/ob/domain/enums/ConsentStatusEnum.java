@@ -7,11 +7,12 @@ import lombok.Getter;
 @Getter
 public enum ConsentStatusEnum {
 
-    AWAITING_AUTHORISATION("AwaitingAuthorisation"),
-    REJECTED("Rejected"),
-    AUTHORISED("Authorised"),
-    REVOKED("Revoked");
+    AWAITING_AUTHORISATION("AwaitingAuthorisation", ""),
+    REJECTED("Rejected", "Reject"),
+    AUTHORISED("Authorised", "Authorise"),
+    REVOKED("Revoked", "");
 
     private final String value;
+    private final String action;
 
 }
