@@ -10,7 +10,8 @@ public enum ConsentStatusEnum {
     AWAITING_AUTHORISATION("AwaitingAuthorisation", ""),
     REJECTED("Rejected", "Reject"),
     AUTHORISED("Authorised", "Authorise"),
-    REVOKED("Revoked", "");
+    REVOKED("Revoked", ""),
+    EXPIRED("Expired", "");
 
     private final String value;
     private final String action;

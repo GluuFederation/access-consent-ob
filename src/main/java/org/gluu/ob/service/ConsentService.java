@@ -1,5 +1,7 @@
 package org.gluu.ob.service;
 
+import io.quarkus.scheduler.Scheduled;
+import io.quarkus.scheduler.ScheduledExecution;
 import lombok.extern.slf4j.Slf4j;
 import org.gluu.ob.domain.entity.ConsentEntity;
 import org.gluu.ob.domain.enums.ConsentStatusEnum;
@@ -15,6 +17,7 @@ import org.springframework.util.StringUtils;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
@@ -136,6 +139,19 @@ public class ConsentService {
         log.info("Consent updated, values: {}, action: {}", consent, action);
 
         return ConsentConverter.toObject(consent);
+    }
+
+    @Scheduled(every = "5s")
+    void processExpiredConsents() {
+        List<ConsentEntity> expiredConsents = consentRepository.findConsentEntitiesByStatusAndExpirationDatetimeNotNullAndExpirationDatetimeBefore(
+                ConsentStatusEnum.AWAITING_AUTHORISATION, new Date());
+        final Date now = new Date();
+        expiredConsents.forEach(consent -> {
+            consent.setStatusUpdateDatetime(now);
+            consent.setStatus(ConsentStatusEnum.EXPIRED);
+            consentRepository.save(consent);
+            log.info("Expired consent entity, data: {}, id: {}", consent, consent.getId());
+        });
     }
 
 }
