@@ -54,15 +54,12 @@ public class ConsentEntity {
     private String[] permissions;
 
     @Column(name = "expiration_datetime")
-    @NotNull
     private Date expirationDatetime;
 
     @Column(name = "transaction_from_datetime")
-    @NotNull
     private Date transactionFromDatetime;
 
     @Column(name = "transaction_to_datetime")
-    @NotNull
     private Date transactionToDatetime;
 
 }

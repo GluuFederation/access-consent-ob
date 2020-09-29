@@ -10,6 +10,7 @@ import org.gluu.ob.rest.model.PostConsent;
 import org.gluu.ob.util.ApiConstants;
 import org.gluu.ob.util.Utils;
 import org.gluu.ob.util.converters.ConsentConverter;
+import org.springframework.util.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -25,6 +26,8 @@ public class ConsentService {
 
     public Consent create(PostConsent newConsent) throws InternalError {
         try {
+            validate(newConsent);
+
             final Date now = new Date();
 
             ConsentEntity consentEntity = new ConsentEntity();
@@ -42,9 +45,38 @@ public class ConsentService {
             log.info("New consent created, data: {}", consentEntity);
 
             return ConsentConverter.toObject(consentEntity);
+        } catch (InternalError e) {
+            throw e;
         } catch (Exception e) {
             log.error("Error registering a new Consent in the DB", e);
             throw new InternalError("Problems registering the new consent entity.");
+        }
+    }
+
+    private void validate(PostConsent consent) throws InternalError {
+        if (consent == null) {
+            throw new InternalError("Consent can not be empty.");
+        }
+        if (consent.getPermissions() == null || consent.getPermissions().size() == 0) {
+            throw new InternalError("List of permissions can not be empty.");
+        }
+        if (StringUtils.isEmpty(consent.getProfile())) {
+            throw new InternalError("Profile can not be empty.");
+        }
+        boolean transactionFromEmpty = StringUtils.isEmpty(consent.getTransactionFromDatetime());
+        boolean transactionToEmpty = StringUtils.isEmpty(consent.getTransactionToDatetime());
+        if ((transactionFromEmpty && !transactionToEmpty) || (!transactionFromEmpty && transactionToEmpty)) {
+            throw new InternalError("Transaction dates are incorrect.");
+        }
+        if (!transactionFromEmpty) {
+            Date fromDate = Utils.parseDate(consent.getTransactionFromDatetime(), ApiConstants.DATE_FORMAT);
+            Date toDate = Utils.parseDate(consent.getTransactionToDatetime(), ApiConstants.DATE_FORMAT);
+            if (fromDate == null || toDate == null) {
+                throw new InternalError("Transaction datetime doesn't have right format.");
+            }
+            if (fromDate.getTime() >= toDate.getTime()) {
+                throw new InternalError("Transaction date times have wrong values, from date can not be greater than to date.");
+            }
         }
     }
 

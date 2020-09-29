@@ -1,23 +1,18 @@
 package org.gluu.ob.rest.resource;
 
 import lombok.extern.slf4j.Slf4j;
-import org.gluu.ob.domain.entity.ConsentEntity;
-import org.gluu.ob.domain.repository.ConsentRepository;
 import org.gluu.ob.exception.InternalError;
 import org.gluu.ob.rest.model.ApiError;
 import org.gluu.ob.rest.model.Consent;
 import org.gluu.ob.rest.model.PostConsent;
 import org.gluu.ob.service.ConsentService;
-import org.gluu.ob.util.converters.ConsentConverter;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.util.Optional;
-
-import static org.gluu.ob.util.ApiConstants.*;
+import static org.gluu.ob.util.ApiConstants.BASE_API_URL;
 
 @Path(BASE_API_URL + "/consents")
 @Consumes(MediaType.APPLICATION_JSON)

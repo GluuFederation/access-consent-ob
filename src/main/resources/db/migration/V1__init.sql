@@ -10,8 +10,8 @@ CREATE TABLE `consent` (
   `status` varchar(30) NOT NULL,
   `status_update_datetime` datetime NOT NULL,
   `permissions` varchar(1000) NOT NULL,
-  `expiration_datetime` datetime NOT NULL,
-  `transaction_from_datetime` datetime NOT NULL,
-  `transaction_to_datetime` datetime NOT NULL,
+  `expiration_datetime` datetime,
+  `transaction_from_datetime` datetime,
+  `transaction_to_datetime` datetime,
   PRIMARY KEY (`id`)
 );
