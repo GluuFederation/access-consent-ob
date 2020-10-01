@@ -19,7 +19,7 @@ import static org.gluu.ob.util.ApiConstants.BASE_API_URL;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Slf4j
-public class ConsentsResource {
+public class ConsentsResource extends Resource {
 
     @Inject
     ConsentService consentService;
@@ -40,7 +40,8 @@ public class ConsentsResource {
     @POST
     public Response postConsent(PostConsent consent) {
         try {
-            Consent newConsent = consentService.create(consent);
+            String clientId = getClientId();
+            Consent newConsent = consentService.create(consent, clientId);
             return Response.ok(newConsent).build();
         } catch (InternalError internalError) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -64,7 +65,7 @@ public class ConsentsResource {
     @Path("/{id}")
     public Response putConsent(@PathParam("id") String consentId, PutConsent putConsent) {
         try {
-            Consent consent = consentService.putConsentStatus(consentId, putConsent.getAction());
+            Consent consent = consentService.putConsentStatus(consentId, putConsent);
             return Response.ok(consent).build();
         } catch (InternalError internalError) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

@@ -1,7 +1,6 @@
 package org.gluu.ob.service;
 
 import io.quarkus.scheduler.Scheduled;
-import io.quarkus.scheduler.ScheduledExecution;
 import lombok.extern.slf4j.Slf4j;
 import org.gluu.ob.domain.entity.ConsentEntity;
 import org.gluu.ob.domain.enums.ConsentStatusEnum;
@@ -9,6 +8,7 @@ import org.gluu.ob.domain.repository.ConsentRepository;
 import org.gluu.ob.exception.InternalError;
 import org.gluu.ob.rest.model.Consent;
 import org.gluu.ob.rest.model.PostConsent;
+import org.gluu.ob.rest.model.PutConsent;
 import org.gluu.ob.util.ApiConstants;
 import org.gluu.ob.util.Utils;
 import org.gluu.ob.util.converters.ConsentConverter;
@@ -27,7 +27,7 @@ public class ConsentService {
     @Inject
     ConsentRepository consentRepository;
 
-    public Consent create(PostConsent newConsent) throws InternalError {
+    public Consent create(PostConsent newConsent, String clientId) throws InternalError {
         try {
             validate(newConsent);
 
@@ -42,6 +42,7 @@ public class ConsentService {
             consentEntity.setStatusUpdateDatetime(now);
             consentEntity.setTransactionFromDatetime(Utils.parseDate(newConsent.getTransactionFromDatetime(), ApiConstants.DATE_FORMAT));
             consentEntity.setTransactionToDatetime(Utils.parseDate(newConsent.getTransactionFromDatetime(), ApiConstants.DATE_FORMAT));
+            consentEntity.setClientId(clientId);
 
             consentEntity = consentRepository.save(consentEntity);
 
@@ -111,9 +112,15 @@ public class ConsentService {
         return consentEntityOptional.map(ConsentConverter::toObject).orElse(null);
     }
 
-    public Consent putConsentStatus(String consentId, String action) throws InternalError {
-        if (StringUtils.isEmpty(action)) {
+    public Consent putConsentStatus(String consentId, PutConsent putConsent) throws InternalError {
+        if (StringUtils.isEmpty(putConsent.getAction())) {
             throw new InternalError("Action can not be empty.");
+        }
+        if (StringUtils.isEmpty(putConsent.getUserId())) {
+            throw new InternalError("User ID can not be empty.");
+        }
+        if (putConsent.getAccounts() == null || putConsent.getAccounts().size() == 0) {
+            throw new InternalError("Any account was sent.");
         }
         Long id = Long.parseLong(consentId.replace(ApiConstants.CONSENT_ID_PREFIX, ""));
         Optional<ConsentEntity> consentEntityOptional = consentRepository.findById(id);
@@ -126,9 +133,11 @@ public class ConsentService {
             throw new InternalError("Consent can not be updated because it is not waiting authorisation.");
         }
 
-        if (action.equals(ConsentStatusEnum.AUTHORISED.getAction())) {
+        if (putConsent.getAction().equals(ConsentStatusEnum.AUTHORISED.getAction())) {
             consent.setStatus(ConsentStatusEnum.AUTHORISED);
-        } else if (action.equals(ConsentStatusEnum.REJECTED.getAction())) {
+            consent.setUserId(putConsent.getUserId());
+            consent.setAccounts(putConsent.getAccounts().toArray(new String[0]));
+        } else if (putConsent.getAction().equals(ConsentStatusEnum.REJECTED.getAction())) {
             consent.setStatus(ConsentStatusEnum.REJECTED);
         } else {
             throw new InternalError("Action can not be processed.");
@@ -136,7 +145,7 @@ public class ConsentService {
         consent.setStatusUpdateDatetime(new Date());
         consent = consentRepository.save(consent);
 
-        log.info("Consent updated, values: {}, action: {}", consent, action);
+        log.info("Consent updated, values: {}, action: {}", consent, putConsent.getAction());
 
         return ConsentConverter.toObject(consent);
     }

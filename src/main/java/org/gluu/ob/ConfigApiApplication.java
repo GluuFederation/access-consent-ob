@@ -1,6 +1,5 @@
 package org.gluu.ob;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +7,6 @@ import org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Produces;
 
 @ApplicationScoped
 @Slf4j

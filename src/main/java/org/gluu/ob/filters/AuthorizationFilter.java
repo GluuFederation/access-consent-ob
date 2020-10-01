@@ -1,6 +1,12 @@
 package org.gluu.ob.filters;
 
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.gluu.ob.rest.client.IdentityProviderService;
+import org.gluu.ob.rest.model.idp.IntrospectionResponse;
+
 import javax.annotation.Priority;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -15,6 +21,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 @PreMatching
 @Priority(1)
+@Slf4j
 public class AuthorizationFilter implements ContainerRequestFilter {
     private static final String AUTHENTICATION_SCHEME = "Bearer";
 
@@ -30,26 +37,24 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     @Context
     private ResourceInfo resourceInfo;
 
-    public void filter(ContainerRequestContext context) {
-//        logger.info("=======================================================================");
-//        logger.info("======" + context.getMethod() + " " + info.getPath() + " FROM IP " + request.getRemoteAddr());
-//        logger.info("======PERFORMING AUTHORIZATION=========================================");
-//        String authorizationHeader = context.getHeaderString(HttpHeaders.AUTHORIZATION);
-//        if (!isTokenBasedAuthentication(authorizationHeader)) {
-//            abortWithUnauthorized(context);
-//            logger.info("======ONLY TOKEN BASED AUTHORIZATION IS SUPPORTED======================");
-//            return;
-//        }
-//        String token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
-//        try {
-//            validateToken(token, context);
-//            logger.info("======AUTHORIZATION  GRANTED===========================================");
-//        } catch (Exception e) {
-//            logger.info("", e);
-//            abortWithUnauthorized(context);
-//            logger.info("======INVALID AUTHORIZATION TOKEN======================================");
-//        }
+    @Inject
+    @RestClient
+    IdentityProviderService identityProviderService;
 
+    public void filter(ContainerRequestContext context) {
+        String authorizationHeader = context.getHeaderString(HttpHeaders.AUTHORIZATION);
+        if (!isTokenBasedAuthentication(authorizationHeader)) {
+            log.info("Access denied for access token: {}", authorizationHeader);
+            abortWithUnauthorized(context);
+            return;
+        }
+        String token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
+        try {
+            validateToken(token, context);
+        } catch (Exception e) {
+            log.error("Problems processing access token", e);
+            abortWithUnauthorized(context);
+        }
     }
 
     private boolean isTokenBasedAuthentication(String authorizationHeader) {
@@ -63,9 +68,14 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     }
 
     private void validateToken(String token, ContainerRequestContext context) throws Exception {
-        //protectionService.processAuthorization(httpHeaders, resourceInfo);
-        // Check if the token was issued by the server and if it's not expired
-        // Throw an Exception if the token is invalid
+        token = token.replace("Bearer ", "");
+        IntrospectionResponse response = identityProviderService.callIntrospectionEndpoint("Bearer " + token, token);
+        if (response.getErrorType() != null) {
+            log.info("Introspection response: {}", response);
+            throw new Exception("Invalid session.");
+        } else {
+            context.setProperty("introspection", response);
+        }
     }
 
 }

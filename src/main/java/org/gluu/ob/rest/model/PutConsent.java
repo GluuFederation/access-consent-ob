@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,5 +14,7 @@ import lombok.ToString;
 public class PutConsent {
 
     private String action;
+    private String userId;
+    private List<String> accounts;
 
 }
