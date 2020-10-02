@@ -17,7 +17,9 @@ function() {
     var config = {
 	    env: env,
 	    baseUrl: baseUrl,
-	    healthUrl: baseUrl + '/health'
+        accessToken: 'aaa949e6-eada-42d2-a9c5-e36f14623435',
+	    healthUrl: baseUrl + '/health',
+        consents_url: baseUrl + '/api/v1/open-banking/consents'
     };
 
     karate.configure('connectTimeout', 30000);

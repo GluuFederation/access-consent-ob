@@ -1,0 +1,7 @@
+{
+  "profile": "open-banking-uk",
+  "permissions": [
+    "ReadAccountsBasic",
+    "ReadAccountsDetail"
+  ]
+}

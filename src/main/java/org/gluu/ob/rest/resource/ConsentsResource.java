@@ -42,7 +42,7 @@ public class ConsentsResource extends Resource {
         try {
             String clientId = getClientId();
             Consent newConsent = consentService.create(consent, clientId);
-            return Response.ok(newConsent).build();
+            return Response.status(201).entity(newConsent).build();
         } catch (InternalError internalError) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(new ApiError(internalError.getDescription())).build();

@@ -116,12 +116,6 @@ public class ConsentService {
         if (StringUtils.isEmpty(putConsent.getAction())) {
             throw new InternalError("Action can not be empty.");
         }
-        if (StringUtils.isEmpty(putConsent.getUserId())) {
-            throw new InternalError("User ID can not be empty.");
-        }
-        if (putConsent.getAccounts() == null || putConsent.getAccounts().size() == 0) {
-            throw new InternalError("Any account was sent.");
-        }
         Long id = Long.parseLong(consentId.replace(ApiConstants.CONSENT_ID_PREFIX, ""));
         Optional<ConsentEntity> consentEntityOptional = consentRepository.findById(id);
         if (consentEntityOptional.isEmpty()) {
@@ -134,6 +128,13 @@ public class ConsentService {
         }
 
         if (putConsent.getAction().equals(ConsentStatusEnum.AUTHORISED.getAction())) {
+            if (StringUtils.isEmpty(putConsent.getUserId())) {
+                throw new InternalError("User ID can not be empty.");
+            }
+            if (putConsent.getAccounts() == null || putConsent.getAccounts().size() == 0) {
+                throw new InternalError("Any account was sent.");
+            }
+
             consent.setStatus(ConsentStatusEnum.AUTHORISED);
             consent.setUserId(putConsent.getUserId());
             consent.setAccounts(putConsent.getAccounts().toArray(new String[0]));

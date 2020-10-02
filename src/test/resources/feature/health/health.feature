@@ -18,7 +18,7 @@ Background:
 
     "status": #string? _ == status_str,
     "checks": '#(health_schema)',
-     checks: '#[2]'  
+     checks: '#[3]'
  }
   """
   
@@ -33,7 +33,7 @@ Background:
 
     "status": #string? _ == status_str,
     "checks": '#(health_schema)',
-     checks: '#[1]'  
+     checks: '#[1]'
  }
   """
     
@@ -47,7 +47,7 @@ Background:
 
     "status": #string? _ == status_str,
     "checks": '#(health_schema)',
-     checks: '#[1]'  
+     checks: '#[2]'
  }
   """
   

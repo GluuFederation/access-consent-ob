@@ -1,0 +1,8 @@
+{
+  "action": "Authorise",
+  "userId": "1234",
+  "accounts": [
+    "account-123",
+    "account-321"
+  ]
+}
