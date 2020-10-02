@@ -15,4 +15,182 @@ tags:
     description: access-consent has many different endpoints responsible to manage consents in an Open Banking deployment.
   - name: Open Banking UK
   - name: OAuth - OpenID Connect
-
+paths:
+  '/api/v1/open-banking/consents/{consent_id}':
+    parameters:
+      - name: consent_id
+        in: path
+        required: true
+        description: Consent ID
+        schema:
+          type: string
+    get:
+      summary: Gets a consent based on the ID.
+      description: Gets a consent based on the ID.
+      operationId: get-consent-by-id
+      tags:
+        - Consents
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Consent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Revokes a consent already registered.
+      description: Revokes a consent already registered.
+      operationId: delete-consent
+      tags:
+        - Consents
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Authorise or reject authorisation of a consent already registered.
+      description: Authorise or reject authorisation of a consent already registered.
+      operationId: put-consent
+      tags:
+        - Consents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutConsent'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  '/api/v1/open-banking/consents':
+    post:
+      summary: Creates a new consent.
+      description: Creates a new consent.
+      operationId: post-consent
+      tags:
+        - Consents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostConsent'
+      responses:
+        '201':
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    Unauthorized:
+      description: Access token is missing or invalid.
+    InternalServerError:
+      description: Internal error occurred. Please check log file for details.
+  schemas:
+    Consent:
+      type: object
+      required:
+        - consentId
+      properties:
+        consentId:
+          type: string
+          description: Unique identifier
+          example: urn-gluu-intent-1
+        profile:
+          type: string
+          description: Profile used for the consent.
+          example: open-banking-uk
+        permissions:
+          type: array
+          description: List of permissions associated to the consent.
+        accounts:
+          type: array
+          description: List of accounts authorised by the PSU for the consent.
+        clientId:
+          type: string
+          description: OP Client used to process the consent.
+        userId:
+          type: string
+          description: PSU ID.
+        status:
+          type: string
+          enum:
+            - AwaitingAuthorisation
+            - Rejected
+            - Authorised
+            - Revoked
+            - Expired
+        statusUpdateDatetime:
+          type: string
+          description: Last update done to the status field.
+          example: 2020-09-29T14:41:50.000-04:00
+        creationDatetime:
+          type: string
+          description: Date time when the consent was created.
+          example: 2020-09-29T14:41:50.000-04:00
+        expirationDatetime:
+          type: string
+          description: Date time when the consent will expire.
+          example: 2020-09-29T14:41:50.000-04:00
+        transactionFromDatetime:
+          type: string
+          description: Date time when the consent started the transaction.
+          example: 2020-09-29T14:41:50.000-04:00
+        transactionToDatetime:
+          type: string
+          description: Date time when the consent will finish the transaction.
+          example: 2020-09-29T14:41:50.000-04:00
+    PostConsent:
+      type: object
+      required:
+        - profile
+        - permissions
+      properties:
+        profile:
+          type: string
+          description: Profile used for the consent.
+          example: open-banking-uk
+        permissions:
+          type: array
+          description: List of permissions associated to the consent.
+        expirationDatetime:
+          type: string
+          description: Date time when the consent will expire.
+          example: 2020-09-29T14:41:50.000-04:00
+        transactionFromDatetime:
+          type: string
+          description: Date time when the consent started the transaction.
+          example: 2020-09-29T14:41:50.000-04:00
+        transactionToDatetime:
+          type: string
+          description: Date time when the consent will finish the transaction.
+          example: 2020-09-29T14:41:50.000-04:00
+    PutConsent:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum:
+            - Authorise
+            - Reject
+        userId:
+          type: string
+          description: PSU ID.
+        accounts:
+          type: array
+          description: List of accounts authorised by the PSU for the consent.
