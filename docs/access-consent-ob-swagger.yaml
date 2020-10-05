@@ -9,7 +9,7 @@ info:
     url: 'https://github.com/GluuFederation/access-consent-ob/blob/master/LICENSE'
   version: '1.0'
 servers:
-  - url: 'https://gluu.org/'
+  - url: 'https://ce-ob.gluu.org/obconnect/'
 tags:
   - name: developers
     description: access-consent has many different endpoints responsible to manage consents in an Open Banking deployment.
@@ -41,6 +41,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      security:
+        - bearerAuth: [ ]
     delete:
       summary: Revokes a consent already registered.
       description: Revokes a consent already registered.
@@ -54,6 +56,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      security:
+        - bearerAuth: [ ]
     put:
       summary: Authorise or reject authorisation of a consent already registered.
       description: Authorise or reject authorisation of a consent already registered.
@@ -73,6 +77,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      security:
+        - bearerAuth: [ ]
   '/api/v1/open-banking/consents':
     post:
       summary: Creates a new consent.
@@ -93,7 +99,14 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      security:
+        - bearerAuth: [ ]
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   responses:
     Unauthorized:
       description: Access token is missing or invalid.
